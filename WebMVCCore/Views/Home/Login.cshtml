@@ -1,0 +1,77 @@
+﻿@{
+    ViewData["Title"] = "Login";
+    Layout = "_Layout";
+}
+
+<div class="content">
+    @using (Html.BeginForm(FormMethod.Post, new { name = "formLogin", @class = "formLogin" }))
+    {
+        @Html.ValidationSummary(true)
+        <div>
+            <h1 class="title title-lg">
+                ガソリンスタンド管理
+            </h1>
+
+            <div>
+                <div>
+                    <label class="text col-3"><b>メール:</b></label>
+                    @Html.TextBox("Email", null, new { type = "text", @class = "input username required col-9 custom-input maxlength", id = "focus", onkeydown = "inblur()", data_name = "メール", data_maxlength="100" })
+                    <div id="email" class="text custom-error">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text col-3"><b>パスワード:</b></label>
+                    @Html.Password("Password", null, new { @class = "input col-9 custom-input required maxlength", id = "password", onkeydown = "inblur()", data_name = "パスワード", data_maxlength = "100" })
+                    <div id="pass" class="text custom-error"></div>
+                </div>
+                
+            </div>
+            <p class="msg-error custom-error">ログインに失敗しました。電子メールまたはパスワードを確認してください。 </p>
+            <div class="button">
+                <input type="button" class="btn btn-primary button-bold" value="ログイン" onclick="submitLogin()"/>
+            </div>
+        </div>
+    }
+</div>
+
+<script type="text/javascript">
+    document.getElementById("focus").focus();
+    function handleSaveEmail(event) {
+        var elValue = event.value;
+    }
+
+    //handle display error from server send
+    function inblur(event) {
+        $(".msg-error").css("display", "none")
+    }
+
+    //handle login
+    function submitLogin() {
+        var email = document.getElementById("focus").value;
+        var password = document.getElementById("password").value;
+        if (validateForm()) {
+            $.ajax({
+                url: "/Home/Login",
+                method: "POST",
+                data: { email: email, pass: password },
+                success: function (result) {
+                    if (result.statusCode == 400) {
+                        $(".msg-error").css("display", "block")
+                        document.getElementById('focus').style.borderColor = 'red';
+                        document.getElementById('password').style.borderColor = 'red';
+                    }
+                    else {
+                        location.href = result.value
+                    }
+
+                },
+                error: function (result) {
+                    return false
+                },
+            })
+        }
+        
+    }
+</script>
+

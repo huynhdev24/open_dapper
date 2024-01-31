@@ -1,0 +1,11 @@
+﻿.vs
+DataAccess/bin
+DataAccess/obj
+Infrastructure/bin
+Infrastructure/obj
+Models/bin
+Models/obj
+Services/bin
+Services/obj
+WebMVCCore/bin
+WebMVCCore/obj

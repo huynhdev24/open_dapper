@@ -1,0 +1,163 @@
+﻿@model Models.ViewModels.GasStationViewModel;
+@using Models;
+@{
+    ViewData["Title"] = "Add GasStation";
+    Layout = "_Layout";
+    var listRating = new List<MType>(ViewBag.getRating);
+
+    //handle GasType
+    var listGasType = new string[] { };
+    listGasType = @ViewBag.listGasType;
+    var jsonListGasType = Json.Serialize(listGasType);
+}
+
+<style>
+    body {
+    }
+
+    #exist {
+        margin-left: 40%;
+    }
+
+    .content {
+        font-size: 16px;
+    }
+
+    #btnAddGasStation {
+        float: right;
+    }
+
+    #textType {
+        font-weight: normal;
+    }
+
+    label.error {
+        color: red;
+    }
+
+    label {
+        font-size: 20px;
+        font-weight: bold;
+    }
+</style>
+
+
+<div class="col-xl-12 page-list">
+    <form asp-action="GasStationAdd" asp-controller="GasStation" method="post" id="add_form">
+        @Html.ValidationSummary(true)
+        <h1 class="title title-lg">
+            ガソリンスタンド登録
+        </h1>
+
+        <!-- ガソリンスタンド名-->
+        <div class="row row-top">
+            <label class="col-xl-4 row-padding-left">
+                ガソリンスタンド名:
+            </label>
+            <input type="text" class="input-border col-xl-6 required maxlength" asp-for="GasStationName" id="GasStationName" name="GasStationName" data-name="ガソリンスタンド名" data-maxlength="100" tabindex="1" autofocus/>
+            <div name="GasStationNameError" class="text custom-error msg-error-left row-bottom-zero"></div>
+            <div class="msg-error custom-error text msg-error-left row-bottom-zero">@(ViewBag.GasStationNameExist)名情報はすでに存在します。</div>
+        </div>
+
+        <!-- 種類 -->
+        <div class="row row-top">
+            <div class="col-xl-4 row-padding-left">
+                <label>
+                    種類:
+                </label>
+            </div>
+            <div class="col-xl-8 row row-left">
+                @foreach (var type in ViewBag.getType)
+                {
+                    <div class="col-4">
+                        <input class="Type" name="Type" data-name="種類" style="margin: 0" type="checkbox" value="@type.TypeId" />
+                        <label id="textType" for="@type.TypeCode" style="font-size: 16px;">
+                            @type.TypeText
+                        </label>
+                    </div>
+                }
+
+            </div>
+            <input id="checkGasType" class="required" name="Type" hidden value="1">
+            <div name="Error" class="text custom-error msg-error-left row-bottom-zero"></div>
+        </div>
+
+        <!-- Longitude -->
+        <div class="row row-top">
+            <label asp-for="Longitude" class="col-xl-4 row-padding-left">Longitude:</label>
+            <input type="text" id="Longitude" name="Longitude" data-name="Longitude" class="input-border col-xl-6 required" tabindex="3" />
+            <div name="LongitudeError" class="text custom-error msg-error-left row-bottom-zero"></div>
+        </div>
+
+        <!-- Latitude -->
+        <div class="row row-top">
+            <label type="text" class="col-xl-4 row-padding-left">Latitude:</label>
+            <input id="Latitude" name="Latitude" data-name="Latitude" class="input-border col-xl-6 required" tabindex="4" />
+            <div name="LatitudeError" class="text custom-error msg-error-left row-bottom-zero"></div>
+        </div>
+
+        <!-- 地区 -->
+        <div class="row row-top">
+            <label class="col-xl-4 row-padding-left">
+                地区:
+            </label>
+            <select class="col-xl-6 option-size option-heigth option-margin required" id="District" name="District" data-name="地区" tabindex="5"
+                    asp-items="@(new SelectList(@ViewBag.getDistrict,"DistrictId","DistrictName"))">
+                <option value=""></option>
+            </select>
+            <div name="DistrictError" class="text custom-error msg-error-left row-bottom-zero"></div>
+        </div>
+
+        <!-- 住所 -->
+        <div class="row row-top">
+            <label class="col-xl-4 row-padding-left">
+                住所:
+            </label>
+            <input class="input-border col-xl-6 maxlength" type="text" id="Address" name="Address" data-name="住所" data-maxlength="200" tabindex="6" />
+            <div name="AddressError" class="text custom-error msg-error-left row-bottom-zero"></div>
+        </div>
+
+        <!-- 開館時間 -->
+        <div class="row row-top">
+            <label class="col-xl-4 row-padding-left">
+                開館時間:
+            </label>
+            <input class="input-border col-xl-6 maxlength" type="text" id="OpeningTime" name="OpeningTime" data-name="開館時間" data-maxlength="50" tabindex="7" />
+            <div name="OpeningTimeError" class="text custom-error msg-error-left row-bottom-zero"></div>
+        </div>
+
+        <!-- 評価 -->
+        <div class="row row-top">
+            <div class="col-xl-4 row-padding-left">
+                <label>
+                    評価:
+                </label>
+            </div>
+            <div class="col-xl-6 row">
+                @foreach (var type in listRating)
+                {
+                    <div class="col-4">
+                        <div class="image-container">
+                            <input id="Rating" name="Rating" data-name="評価" type="radio" style="margin-top: 15px;" tabindex="8" value="@type.TypeId" checked="@(type == listRating.Find(x => x.TypeId.ToString() == "2") ? "checked" : null)" />
+                            <img src="~/img/@Html.Raw(@type.TypeId + ".png")" width="40" alt="@type.TypeText" />
+                            <span class="image-centered" style="font-size: 8px;">@type.TypeText</span>
+                        </div>
+                    </div>
+                }
+            </div>
+
+        </div>
+
+        <!-- 登録 && 戻る -->
+        <div class="row row-top">
+            <div class="col-xl-5"></div>
+            <div class="col-xl-2"></div>
+            <div id="btnAddGasStation" class="col-xl-5 align-items-md-center">
+                <input type="button" onclick="formSubmit()" value="登録" style="width:80px" class="btn btn-primary" tabindex="9"></input>
+                <input type="button" style="width:80px" class="btn btn-primary" value="戻る" onclick="history.back()" tabindex="10" />
+            </div>
+        </div>
+
+        <div asp-validation-summary="ModelOnly" class="text custom-error"></div>
+    </form>
+</div>

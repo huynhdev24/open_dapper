@@ -1,0 +1,284 @@
+﻿@model IPagedList<Models.ViewModels.GasStationViewModel>
+@using X.PagedList.Mvc.Core;
+@using X.PagedList;
+@using Models;
+@*@using Models.ViewModels;*@
+
+@{
+    ViewData["Title"] = "GasStationList";
+    Layout = "_Layout";
+    var listDistStrict = new List<MDistrict>(@ViewBag.getDistrict);
+    var searchGasName = @ViewBag.searchGasName;
+    var searchDistrict = @ViewBag.searchDistrict;
+    var listGasType = new string[] { };
+    listGasType = @ViewBag.listGasType;
+    var jsonListGasType = Json.Serialize(listGasType);
+    //var renderGas = @ViewBag.listGasStation;
+}
+<style>
+    #btn1 {
+        margin-left: 24.2%;
+        /*        padding: 10px 40px;
+        */
+    }
+
+
+
+    #btnAddGasStation {
+        padding: 8px 40px;
+    }
+
+    /*h4 {
+            text-align: center;
+        }*/
+
+    #page {
+        text-align: center;
+    }
+
+    #text3 {
+        font-weight: normal;
+    }
+
+    /* refactor code css */
+
+</style>
+
+<div class="col-xl-12 page-list">
+    <div class="row">
+        <div class="col-xl-4"></div>
+        <div class="col-xl-4">
+            <h1 class="title title-lg">
+                ガソリンスタンド一覧
+            </h1>
+        </div>
+        <div class="col-xl-4">
+            <div class="row">
+                <div class="col-xl-6">
+                </div>
+                <div class="col-xl-4">
+                    <button type="button" class="title btn btn-primary custom-btn button-bold" style="width: 100px">
+                        マップ
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br />
+    <form asp-controller="ListGasStation" asp-action="GasStationList" method="get" id="gasList" onsubmit="submitForm()">
+        <div class="row row-bottom">
+            <label class="title col-xl-4 title-left">ガソリンスタンド名: </label>
+            <input id="text1" name="searchGasName" class="input col-xl-6" type="text" value="@searchGasName" autofocus />
+        </div>
+
+        <div class="row">
+            <label class="title col-xl-4 title-left">
+                種類:
+            </label>
+            <div class="col-xl-8 row row-left">
+                @foreach (var type in ViewBag.getType)
+                {
+                    <div style="margin: 0" class="col-4">
+                        <input id="@type.TypeType" name="checkBoxGasType" type="checkbox" value="@type.TypeId" />
+                        <label id="text3">
+                            @type.TypeText
+                        </label>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="row">
+
+            <label class="title col-xl-4 title-left">地区: </label>
+
+            <select id="text2" name="searchDistrict" class="col-xl-6">
+                <option value=""></option>
+                @foreach (var item in listDistStrict)
+                {
+                    if (searchDistrict == @item.DistrictId.ToString())
+                    {
+                        <option class="option-size" value=@item.DistrictId selected>@item.DistrictName</option>
+                    }
+                    else
+                    {
+                        <option class="option-size" value=@item.DistrictId>@item.DistrictName</option>
+                    }
+                }
+            </select>
+
+        </div>
+
+        <div class="row">
+            <div class="col-xl-4"></div>
+            <div class="col-xl-4 row-left" style="margin-top: 8px">
+                <button id="btn1" name="searchGasName" type="submit" class="title btn btn-primary custom-btn" style="height:40px; margin-left: 0; text-align: center; width: 100px;">
+                    検索
+                </button>
+            </div>
+        </div>
+    </form><br />
+    <a href="/AddGasStation/GasStationAdd" style="height:40px; width: 130px; display: block">
+        <button id="btnAddGasStation" class="btn btn-primary title custom-btn" style="height:40px; width: 130px">
+            登録
+        </button>
+    </a>
+    <table class="table table-bordered table-striped table-hover">
+        <thead>
+            <tr>
+                <th class="custom-fonttable" style="min-width: 170px;">
+                    ガソリンスタンド名
+                </th>
+                <th class="custom-fonttable" style="min-width: 150px;">
+                    種類
+                </th>
+                <th class="custom-fonttable" style="min-width: 150px;">
+                    地区
+                </th>
+                <td class="custom-fonttable" style="max-width: 16%;">
+                    Longitude, Latitude
+                </td>
+                <th class="custom-fonttable" style="min-width: 70px;">
+                    評価
+                </th>
+                <th class="custom-fonttable" style="max-width: 20%;">Edit</th>
+                <th class="custom-fonttable" style="max-width: 20%;">
+                    Del
+                </th>
+            </tr>
+        </thead>
+
+        <tbody id="tblData">
+            @{
+                @if (Model.Count() > 0)
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="custom-fonttable custom-fonttable-align">
+                                @if (item.GasStationName.Length > 30)
+                                {
+                                    <a id="@item.GasStationId" name="gasId" data-name="@item.GasStationName" title="@item.GasStationName" style="color: black; vertical-align: middle" href="~/GasStation/GasStationFeedBackView/@item.GasStationId">@(item.GasStationName.Substring(0,30)+"...")</a>
+                                }
+                                else
+                                {
+                                    <a id="@item.GasStationId" name="gasId" data-name="@item.GasStationName" style="color: black; vertical-align: middle" href="~/GasStation/GasStationFeedBackView/@item.GasStationId">@item.GasStationName</a>
+                                }
+                            </td>
+                            <td class="custom-fonttable custom-fonttable-align">
+                                @item.GasTypes
+                            </td>
+                            <td class="custom-fonttable">
+                                @item.DistrictName
+                            </td>
+                            <td class="custom-fonttable">
+                                @item.Longitude,@item.Latitude
+                            </td>
+                            <td class="custom-fonttable">
+                                <img class="icon-size" src="~/img/@(item.Rating + ".png")" alt="@item.Rating" />
+                            </td>
+                            <td class="custom-fonttable">
+                                <a href="~/EditGasStation/GasStationEdit/@item.GasStationId"> <button class="btn btn-success">Edit</button></a>
+                            </td>
+                            <td class="custom-fonttable">
+                                <button onclick="DeleteItem(this)" data-name="@item.GasStationName" data-id="@item.GasStationId" class="btn btn-danger">Del</button>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td class="text-danger option-size" colspan="7">
+                            該当するデータはありません
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+    @if (Model.Count() > 0)
+    {
+        <div id="page">
+            Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) / @Model.PageCount
+
+            @Html.PagedListPager(Model, page => Url.Action("GasStationList",
+                new { searchGasName, searchDistrict, jsonListGasType, page }))
+        </div>
+    }
+    else
+    {
+
+    }
+</div>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+<script>
+    // handle list GasType to send Controller
+    const listGasType = @Html.Raw(Json.Serialize(listGasType));
+    const listCheckBoxGasType = document.querySelectorAll("input[name=checkBoxGasType]");
+    for (let i = 0; i < listCheckBoxGasType.length; i++) {
+        if (listGasType.includes(listCheckBoxGasType[i].value)) {
+            listCheckBoxGasType[i].checked = true
+        }
+    }
+
+    // submitForm
+    function submitForm() {
+        var listGasType = [];
+        var elCheckBoxGasType = document.querySelectorAll("input[name=checkBoxGasType]")
+        let count = 0;
+        for (let i = 0; i < elCheckBoxGasType.length; i++) {
+            console.log(elCheckBoxGasType[i])
+            if (elCheckBoxGasType[i].checked) {
+                listGasType[count] = elCheckBoxGasType[i].value
+                count++
+            }
+        }
+        let jsonListGasType = JSON.stringify(listGasType)
+        var form = document.getElementById("gasList");
+        const el = document.createElement("input");
+        el.name = "jsonListGasType";
+        el.value = jsonListGasType;
+        el.hidden = true;
+        form.appendChild(el);
+    }
+
+    /**
+     * Delete a GasStation
+     * param {any} obj
+     */
+    function DeleteItem(obj) {
+        var gasStationId = obj.getAttribute("data-id");
+        var gasID = obj.getAttribute("data-name");
+
+        Swal.fire({
+            title: "確認",
+            text: "ガソリンスタンド" + gasID + "は削除されますか？",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'はい',
+            cancelButtonText: 'いいえ',
+            confirmButtonColor: 'red',
+        }).then((res) => {
+            if (res.isConfirmed) {
+                $.ajax({
+                    url: "/ListGasStation/GasStationDelete",
+                    data: { gasStationId: gasStationId },
+                    dataType: "json",
+                    type: "POST",
+                    success: function (result) {
+                        if (result.content == "Ok") {
+                            Swal.fire({
+                                icon: 'success',
+                                text: '削除しました。',
+                            }).then(() => {
+                                location.reload();
+                            });
+                        }
+                    }
+                });
+            }
+        });
+    }
+</script>
